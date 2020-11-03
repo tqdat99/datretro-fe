@@ -10,7 +10,9 @@ import Board from 'react-trello'
 const axios = require('axios');
 const qs = require('querystring');
 
-function BoardDetail(props) {
+const data = {}
+
+function MyBoard(props) {
     const logined = quickCheckToken();
     //const [detail, setDetail] = useState([]);
     const [boardName, setBoardName] = useState();
@@ -42,6 +44,7 @@ function BoardDetail(props) {
         ]
     });
 
+
     const requestBody = {
         title: newBoardTitle,
     }
@@ -54,45 +57,49 @@ function BoardDetail(props) {
 
     let mounted = true;
 
-    useEffect(() => {
-        axios.get(`${config.api_url}/boards/${boardId}`)
-            .then((res) => {
+    useEffect(async () => {
+        loadBoardData();
+        return () => {
+            mounted = false;
+        };
+    }, []);
+
+    const loadBoardData = async () => {
+        await axios.get(`${config.api_url}/boards/${boardId}`)
+            .then(async (res) => {
                 setBoardName(res.data["title"]);
-                console.log("useEffect");
                 //console.log(data);
-                console.log(boardData);
-                axios.get(`${config.api_url}/boards/${boardId}/cards`)
+                await axios.get(`${config.api_url}/boards/${boardId}/cards`)
                     .then((res) => {
-                        for (let d of res.data) {
-                            if (d.column === 'went-well') {
-                                let objectCard = {
-                                    id: d._id,
-                                    title: d.title,
-                                    description: d.content,
+                        console.log("yes")
+                        for (let item of res.data) {
+                            if (item.column === 'went-well') {
+                                let card = {
+                                    id: item._id,
+                                    title: item.title,
+                                    description: item.content,
                                 };
-                                boardData.lanes[0].cards.push(objectCard);
-                            } else if (d.column === 'to-improve') {
+                                boardData.lanes[0].cards.push(card);
+                            } else if (item.column === 'to-improve') {
                                 let objectCard = {
-                                    id: d._id,
-                                    title: d.title,
-                                    description: d.content,
+                                    id: item._id,
+                                    title: item.title,
+                                    description: item.content,
                                 };
                                 boardData.lanes[1].cards.push(objectCard);
-                            } else if (d.column === 'action-items') {
+                            } else if (item.column === 'action-items') {
                                 let objectCard = {
-                                    id: d._id,
-                                    title: d.title,
-                                    description: d.content,
+                                    id: item._id,
+                                    title: item.title,
+                                    description: item.content,
                                 };
                                 boardData.lanes[2].cards.push(objectCard);
                             }
                         }
                         console.log(boardData);
-
                         if (mounted) {
                             setBoardData(boardData);
-                            mounted = false; addEditEntryPoint();
-
+                            mounted = false;
                         }
                     })
                     .catch((err) => {
@@ -102,10 +109,7 @@ function BoardDetail(props) {
             .catch((err) => {
                 console.log(err);
             })
-        return () => {
-            mounted = false;
-        };
-    }, []);
+    }
 
     const shouldReceiveNewData = (nextData) => {
         // console.log("shouldReceiveNewData");
@@ -149,7 +153,7 @@ function BoardDetail(props) {
             })
     }
 
-    function handleDeleteBoard() {
+    const handleDeleteBoard = () => {
         axios.delete(`${config.api_url}/boards/${boardId}/delete`)
             .then((res) => {
                 window.location.href = '/';
@@ -159,7 +163,7 @@ function BoardDetail(props) {
             })
     }
 
-    function handleRenameBoard() {
+    const handleRenameBoard = () => {
         console.log("clicked");
         axios.patch(`${config.api_url}/boards/${boardId}/update`, qs.stringify(requestBody), reqConfig)
             .then((res) => {
@@ -236,5 +240,4 @@ const addEditEntryPoint = () => {
 
 
 
-export default BoardDetail
-addEditEntryPoint();
+export default MyBoard
