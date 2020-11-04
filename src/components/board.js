@@ -68,33 +68,15 @@ function MyBoard(props) {
         await axios.get(`${config.api_url}/boards/${boardId}`)
             .then(async (res) => {
                 setBoardName(res.data["title"]);
-                //console.log(data);
                 await axios.get(`${config.api_url}/boards/${boardId}/cards`)
                     .then((res) => {
-                        console.log("yes")
                         for (let item of res.data) {
-                            if (item.column === 'went-well') {
-                                let card = {
-                                    id: item._id,
-                                    title: item.title,
-                                    description: item.content,
-                                };
-                                boardData.lanes[0].cards.push(card);
-                            } else if (item.column === 'to-improve') {
-                                let objectCard = {
-                                    id: item._id,
-                                    title: item.title,
-                                    description: item.content,
-                                };
-                                boardData.lanes[1].cards.push(objectCard);
-                            } else if (item.column === 'action-items') {
-                                let objectCard = {
-                                    id: item._id,
-                                    title: item.title,
-                                    description: item.content,
-                                };
-                                boardData.lanes[2].cards.push(objectCard);
-                            }
+                            let card = {
+                                id: item._id,
+                                title: item.title,
+                                description: item.content,
+                            };
+                            boardData.lanes.find(x => x.id === item.column).cards.push(card);
                         }
                         console.log(boardData);
                         if (mounted) {
