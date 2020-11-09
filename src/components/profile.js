@@ -1,13 +1,13 @@
 import { Form, Button, Container, Card, Col, Row } from 'react-bootstrap';
 import React, { useEffect, useState } from "react";
-import { callAPI, getCookie, quickCheckToken, setCookie } from "../helpers";
+import { getCookie, quickCheckToken, setCookie } from "../helpers";
 import { config } from "../config";
 import { Link, Redirect } from "react-router-dom";
 import Header from "./header";
 const axios = require('axios');
 const qs = require('querystring');
 
-function Profile() {
+function Profile(props) {
     const logined = quickCheckToken();
 
     const [userId, setUserId] = useState("");

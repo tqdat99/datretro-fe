@@ -6,6 +6,9 @@ function Header() {
     function handleLogout() {
         deleteCookie(config.cookie_token);
         deleteCookie(config.cookie_username);
+        deleteCookie('facebook.com');
+        deleteCookie('google.com');
+        deleteCookie('accounts.google.com');
         window.location.href = "/";
     }
     function handleProfile() {

@@ -1,8 +1,11 @@
 import { Form, Button, Container, Card } from 'react-bootstrap';
 import { useState } from "react";
-import { callAPI, setCookie } from "../helpers";
+import { setCookie } from "../helpers";
 import { config } from "../config";
 import { Link } from "react-router-dom";
+import GoogleBtn from './googleBtn';
+import FacebookBtn from './facebookBtn';
+
 const axios = require('axios');
 const qs = require('querystring');
 const bcrypt = require('bcryptjs');
@@ -61,6 +64,8 @@ function Login() {
                     <Form.Control type="password" placeholder="Password" onChange={e => setPassword(e.target.value)} required />
                 </Form.Group>
                 <Button onClick={actionLogin} variant="primary" type="button">Login</Button>
+                <GoogleBtn />
+                <FacebookBtn />
                 <Link style={{ marginLeft: "20px" }} to="/signup">Sign up</Link>
             </Form>
         </Card>

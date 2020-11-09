@@ -7,14 +7,18 @@ const bcrypt = require('bcryptjs');
 const axios = require('axios');
 const qs = require('querystring');
 
-function Signup() {
+function Signup(props) {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [retypedPassword, setRetypedPassword] = useState("");
     const [displayName, setDisplayName] = useState("");
 
     function signupHandler() {
-        if (password !== retypedPassword) {
+        if (password.length < 4) {
+            alert("Password must contain at least 4 characters.");
+            return;
+        }
+        else if (password !== retypedPassword) {
             alert("Password does not match.");
             return;
         }

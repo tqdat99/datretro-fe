@@ -1,4 +1,4 @@
-import { callAPI, getCookie, quickCheckToken } from "../helpers";
+import { getCookie, quickCheckToken } from "../helpers";
 import { Redirect } from 'react-router-dom';
 import { Container, Row, Button, Modal, Form } from "react-bootstrap";
 import React, { useEffect, useState, Component } from "react";
