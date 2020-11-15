@@ -1,6 +1,6 @@
-import { getCookie, quickCheckToken } from "../helpers";
+import { getCookie, quickCheckToken, setCookie } from "../helpers";
 import { Redirect } from 'react-router-dom';
-import { Container, Row, Button, Modal, Form } from "react-bootstrap";
+import { Container, Row, Button, Modal, Form, CardColumns } from "react-bootstrap";
 import React, { useEffect, useState, Component } from "react";
 import { config } from "../config";
 import Header from "./header";
@@ -14,16 +14,7 @@ const data = {}
 
 function MyBoard(props) {
     const logined = quickCheckToken();
-    //const [detail, setDetail] = useState([]);
-    const [boardName, setBoardName] = useState();
-    const boardId = props.match.params.boardId;
-    const [renameModalShow, setRenameModalShow] = useState(false);
-    const [deleteModalShow, setDeleteModalShow] = useState(false);
-    const [newBoardTitle, setNewBoardTitle] = useState("");
-    const handleCloseRenameModal = () => setRenameModalShow(false);
-    const handleShowRenameModal = () => setRenameModalShow(true);
-    const handleCloseDeleteModal = () => setDeleteModalShow(false);
-    const handleShowDeleteModal = () => setDeleteModalShow(true);
+
     const [boardData, setBoardData] = useState({
         lanes: [
             {
@@ -43,17 +34,26 @@ function MyBoard(props) {
             },
         ]
     });
+    const [boardTitle, setboardTitle] = useState();
+    const boardId = props.match.params.boardId;
+    const [renameModalShow, setRenameModalShow] = useState(false);
+    const [deleteModalShow, setDeleteModalShow] = useState(false);
+    const [newBoardTitle, setNewBoardTitle] = useState("");
+    const handleCloseRenameModal = () => setRenameModalShow(false);
+    const handleShowRenameModal = () => setRenameModalShow(true);
+    const handleCloseDeleteModal = () => setDeleteModalShow(false);
+    const handleShowDeleteModal = () => setDeleteModalShow(true);
 
-
-    const requestBody = {
-        title: newBoardTitle,
-    }
-
-    const reqConfig = {
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        }
-    }
+    const [cardId, setCardId] = useState();
+    const [cardTitle, setCardTitle] = useState();
+    const [cardContent, setCardContent] = useState();
+    const [cardColumn, setCardColumn] = useState();
+    const [newCardTitle, setNewCardTitle] = useState();
+    const [newCardContent, setNewCardContent] = useState();
+    const [newCardColumn, setNewCardColumn] = useState();
+    const [editCardModalShow, setEditCardModalShow] = useState(false);
+    const handleCloseEditCardModal = () => setEditCardModalShow(false);
+    const handleShowEditCardModal = () => setEditCardModalShow(true);
 
     let mounted = true;
 
@@ -67,7 +67,7 @@ function MyBoard(props) {
     const loadBoardData = async () => {
         await axios.get(`${config.api_url}/boards/${boardId}`)
             .then(async (res) => {
-                setBoardName(res.data["title"]);
+                setboardTitle(res.data["title"]);
                 await axios.get(`${config.api_url}/boards/${boardId}/cards`)
                     .then((res) => {
                         for (let item of res.data) {
@@ -146,7 +146,15 @@ function MyBoard(props) {
     }
 
     const handleRenameBoard = () => {
-        console.log("clicked");
+        const requestBody = {
+            title: newBoardTitle || boardTitle,
+        }
+
+        const reqConfig = {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        }
         axios.patch(`${config.api_url}/boards/${boardId}/update`, qs.stringify(requestBody), reqConfig)
             .then((res) => {
                 window.location.reload(false);
@@ -156,13 +164,92 @@ function MyBoard(props) {
             })
     }
 
+    const handleCardClick = (cardId, metadata, laneId) => {
+        let selectedCard = findCardByIdInBoardData(cardId);
+        setCardId(selectedCard['id']);
+        setCardTitle(selectedCard['title'])
+        setCardContent(selectedCard['description']);
+        setCardColumn(selectedCard['column']);
+        handleShowEditCardModal();
+    }
+
+    const findCardByIdInBoardData = (cardId) => {
+        var i, j;
+        for (i = 0; i < 3; i++) {
+            for (j = 0; j < boardData.lanes[i].cards.length; j++) {
+                if (boardData.lanes[i].cards[j]['id'] == cardId) {
+                    boardData.lanes[i].cards[j]['column'] = boardData.lanes[i]['id'];
+                    return boardData.lanes[i].cards[j];
+                }
+            }
+        }
+        return null;
+    }
+
+    const handleCardMoveAcrossColumns = (fromLaneId, toLaneId, cardId, index) => {
+        console.log('handleCardMoveAcrossColumns ', fromLaneId, toLaneId, cardId, index);
+        // axios.patch(`${config.api_url}/boards/${boardId}/update`, qs.stringify(requestBody), reqConfig)
+        //     .then((res) => {
+        //         window.location.reload(false);
+        //     })
+        //     .catch((err) => {
+        //         console.log(err);
+        //     })
+    }
+
+    const handleDragStart = (cardId, laneId) => {
+        console.log('handleDragStart', cardId, laneId);
+    }
+
+    const handleDragEnd = (cardId, sourceLaneId, targetLaneId, position, cardDetails) => {
+        console.log('handleDragEnd', cardId, sourceLaneId, targetLaneId, position, cardDetails);
+        const requestBody = {
+            title: cardDetails['title'],
+            content: cardDetails['description'],
+            column: cardDetails['laneId']
+        }
+        const reqConfig = {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        }
+        axios.patch(`${config.api_url}/cards/${cardDetails['id']}/update`, qs.stringify(requestBody), reqConfig)
+            .then((res) => {
+                window.location.reload(false);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }
+
+    const handleEditCard = () => {
+        const requestBody = {
+            title: newCardTitle || cardTitle,
+            content: newCardContent || cardContent,
+            column: newCardColumn || cardColumn
+        }
+        const reqConfig = {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        }
+        console.log('here:', cardId);
+        axios.patch(`${config.api_url}/cards/${cardId}/update`, qs.stringify(requestBody), reqConfig)
+            .then((res) => {
+                window.location.reload(false);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }
+
     if (logined) {
         return (
             <Container fluid>
                 <Header />
                 <div style={{ margin: "80px" }}>
                     <div>
-                        <span style={{ fontSize: "30px" }}>{boardName}</span>
+                        <span style={{ fontSize: "30px" }}>{boardTitle}</span>
                         <Button style={{ marginLeft: "24px" }} variant="secondary" onClick={handleShowRenameModal}>Rename board</Button>
                         <Modal show={renameModalShow} onHide={handleCloseRenameModal}>
                             <Modal.Header closeButton>
@@ -171,7 +258,7 @@ function MyBoard(props) {
                             <Modal.Body><Form>
                                 <Form.Group controlId="boardTitle">
                                     <Form.Label>New board title</Form.Label>
-                                    <Form.Control required type="text" placeholder="New board title" defaultValue={boardName} onChange={e => setNewBoardTitle(e.target.value)} />
+                                    <Form.Control required type="text" placeholder="New board title" defaultValue={boardTitle} onChange={e => setNewBoardTitle(e.target.value)} />
                                 </Form.Group>
                             </Form></Modal.Body>
                             <Modal.Footer>
@@ -186,23 +273,47 @@ function MyBoard(props) {
                                 <Modal.Title>Delete board</Modal.Title>
                             </Modal.Header>
                             <Modal.Body>
-                                <p>Delete {boardName}</p>
+                                <p>Delete {boardTitle}</p>
                             </Modal.Body>
                             <Modal.Footer>
                                 <Button variant="secondary" onClick={handleCloseDeleteModal}>Close</Button>
                                 <Button variant="danger" onClick={handleDeleteBoard}>Delete</Button>
                             </Modal.Footer>
                         </Modal>
+
+                        <Modal show={editCardModalShow} onHide={handleCloseEditCardModal}>
+                            <Modal.Header closeButton>
+                                <Modal.Title>Edit card</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body><Form>
+                                <Form.Group>
+                                    <Form.Label>Card title</Form.Label>
+                                    <Form.Control required type="text" defaultValue={cardTitle} onChange={e => setNewCardTitle(e.target.value)} />
+                                    <Form.Label>Content</Form.Label>
+                                    <Form.Control required type="text" defaultValue={cardContent} onChange={e => setNewCardContent(e.target.value)} />
+                                </Form.Group>
+                            </Form></Modal.Body>
+                            <Modal.Footer>
+                                <Button variant="secondary" onClick={handleCloseEditCardModal}>Close</Button>
+                                <Button variant="primary" onClick={handleEditCard}>Save</Button>
+                            </Modal.Footer>
+                        </Modal>
                     </div>
 
                     <Row style={{ margin: "40px 0 0 0 ", display: "block" }}>
                         <Board
-                            editable
+                            editable={true}
+                            draggable={true}
+                            laneDraggable={false}
+                            cardDraggable={true}
                             onCardAdd={handleCardAdd}
                             data={boardData}
                             onDataChange={shouldReceiveNewData}
-                            //eventBusHandle={setEventBus}
+                            onCardMoveAcrossLanes={handleCardMoveAcrossColumns}
+                            onCardClick={handleCardClick}
                             onCardDelete={handleCardDelete}
+                            handleDragStart={handleDragStart}
+                            handleDragEnd={handleDragEnd}
                         />
                     </Row>
                 </div>
