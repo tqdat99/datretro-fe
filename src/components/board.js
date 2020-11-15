@@ -34,7 +34,8 @@ function MyBoard(props) {
             },
         ]
     });
-    const [boardTitle, setboardTitle] = useState();
+
+    const [boardTitle, setBoardTitle] = useState();
     const boardId = props.match.params.boardId;
     const [renameModalShow, setRenameModalShow] = useState(false);
     const [deleteModalShow, setDeleteModalShow] = useState(false);
@@ -55,20 +56,45 @@ function MyBoard(props) {
     const handleCloseEditCardModal = () => setEditCardModalShow(false);
     const handleShowEditCardModal = () => setEditCardModalShow(true);
 
-    let mounted = true;
+    const [mounted, setMounted] = useState(true);
+    const [count, setCount] = useState(0);
 
     useEffect(async () => {
-        loadBoardData();
-        return () => {
-            mounted = false;
-        };
+        if (mounted) {
+
+            //Get board data (title and cards)
+            axios.get(`${config.api_url}/boards/${boardId}`)
+                .then(async (res) => {
+                    setBoardTitle(res.data["title"]);
+                    axios.get(`${config.api_url}/boards/${boardId}/cards`)
+                        .then((res) => {
+                            for (let item of res.data) {
+                                let card = {
+                                    id: item._id,
+                                    title: item.title,
+                                    description: item.content,
+                                };
+                                boardData.lanes.find(x => x.id === item.column).cards.push(card);
+                            }
+                            console.log(boardData);
+                            setBoardData(boardData);
+                            setMounted(false);
+                        })
+                        .catch((err) => {
+                            console.log(err);
+                        })
+                })
+                .catch((err) => {
+                    console.log(err);
+                })
+        }
     }, []);
 
-    const loadBoardData = async () => {
-        await axios.get(`${config.api_url}/boards/${boardId}`)
+    const loadBoardData = () => {
+        axios.get(`${config.api_url}/boards/${boardId}`)
             .then(async (res) => {
-                setboardTitle(res.data["title"]);
-                await axios.get(`${config.api_url}/boards/${boardId}/cards`)
+                setBoardTitle(res.data["title"]);
+                axios.get(`${config.api_url}/boards/${boardId}/cards`)
                     .then((res) => {
                         for (let item of res.data) {
                             let card = {
@@ -79,10 +105,7 @@ function MyBoard(props) {
                             boardData.lanes.find(x => x.id === item.column).cards.push(card);
                         }
                         console.log(boardData);
-                        if (mounted) {
-                            setBoardData(boardData);
-                            mounted = false;
-                        }
+                        setBoardData(boardData);
                     })
                     .catch((err) => {
                         console.log(err);
@@ -92,6 +115,7 @@ function MyBoard(props) {
                 console.log(err);
             })
     }
+
 
     const shouldReceiveNewData = (nextData) => {
         // console.log("shouldReceiveNewData");
@@ -157,7 +181,9 @@ function MyBoard(props) {
         }
         axios.patch(`${config.api_url}/boards/${boardId}/update`, qs.stringify(requestBody), reqConfig)
             .then((res) => {
-                window.location.reload(false);
+                //window.location.reload(false);
+                //setBoardTitle(newBoardTitle);
+                handleCloseRenameModal();
             })
             .catch((err) => {
                 console.log(err);
@@ -186,23 +212,12 @@ function MyBoard(props) {
         return null;
     }
 
-    const handleCardMoveAcrossColumns = (fromLaneId, toLaneId, cardId, index) => {
-        console.log('handleCardMoveAcrossColumns ', fromLaneId, toLaneId, cardId, index);
-        // axios.patch(`${config.api_url}/boards/${boardId}/update`, qs.stringify(requestBody), reqConfig)
-        //     .then((res) => {
-        //         window.location.reload(false);
-        //     })
-        //     .catch((err) => {
-        //         console.log(err);
-        //     })
-    }
-
     const handleDragStart = (cardId, laneId) => {
-        console.log('handleDragStart', cardId, laneId);
+        //console.log('handleDragStart', cardId, laneId);
     }
 
     const handleDragEnd = (cardId, sourceLaneId, targetLaneId, position, cardDetails) => {
-        console.log('handleDragEnd', cardId, sourceLaneId, targetLaneId, position, cardDetails);
+        //console.log('handleDragEnd', cardId, sourceLaneId, targetLaneId, position, cardDetails);
         const requestBody = {
             title: cardDetails['title'],
             content: cardDetails['description'],
@@ -215,7 +230,7 @@ function MyBoard(props) {
         }
         axios.patch(`${config.api_url}/cards/${cardDetails['id']}/update`, qs.stringify(requestBody), reqConfig)
             .then((res) => {
-                window.location.reload(false);
+                //window.location.reload(false);
             })
             .catch((err) => {
                 console.log(err);
@@ -236,7 +251,8 @@ function MyBoard(props) {
         console.log('here:', cardId);
         axios.patch(`${config.api_url}/cards/${cardId}/update`, qs.stringify(requestBody), reqConfig)
             .then((res) => {
-                window.location.reload(false);
+                //window.location.reload(false);
+                handleCloseEditCardModal();
             })
             .catch((err) => {
                 console.log(err);
@@ -246,6 +262,12 @@ function MyBoard(props) {
     if (logined) {
         return (
             <Container fluid>
+                <div>
+                    <p>You clicked {count} times</p>
+                    <button onClick={() => setCount(count + 1)}>
+                        Click me
+      </button>
+                </div>
                 <Header />
                 <div style={{ margin: "80px" }}>
                     <div>
@@ -309,7 +331,6 @@ function MyBoard(props) {
                             onCardAdd={handleCardAdd}
                             data={boardData}
                             onDataChange={shouldReceiveNewData}
-                            onCardMoveAcrossLanes={handleCardMoveAcrossColumns}
                             onCardClick={handleCardClick}
                             onCardDelete={handleCardDelete}
                             handleDragStart={handleDragStart}
@@ -324,13 +345,5 @@ function MyBoard(props) {
         window.location.href = '/';
     }
 }
-
-const addEditEntryPoint = () => {
-    console.log("addEditEntryPoint");
-    var x = document.getElementsByClassName("smooth-dnd-draggable-wrapper");
-    console.log(x);
-}
-
-
 
 export default MyBoard
