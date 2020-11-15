@@ -24,6 +24,7 @@ function Login() {
     }
 
     function actionLogin() {
+        console.log(config.api_url)
         axios.get(`${config.api_url}/users/${username}/password`)
             .then(res => {
                 console.log(res);

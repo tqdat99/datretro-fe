@@ -57,11 +57,9 @@ function MyBoard(props) {
     const handleShowEditCardModal = () => setEditCardModalShow(true);
 
     const [mounted, setMounted] = useState(true);
-    const [count, setCount] = useState(0);
 
-    useEffect(async () => {
+    useEffect(() => {
         if (mounted) {
-
             //Get board data (title and cards)
             axios.get(`${config.api_url}/boards/${boardId}`)
                 .then(async (res) => {
@@ -76,7 +74,7 @@ function MyBoard(props) {
                                 };
                                 boardData.lanes.find(x => x.id === item.column).cards.push(card);
                             }
-                            console.log(boardData);
+                            console.log('boardData:', boardData);
                             setBoardData(boardData);
                             setMounted(false);
                         })
@@ -90,31 +88,31 @@ function MyBoard(props) {
         }
     }, []);
 
-    const loadBoardData = () => {
-        axios.get(`${config.api_url}/boards/${boardId}`)
-            .then(async (res) => {
-                setBoardTitle(res.data["title"]);
-                axios.get(`${config.api_url}/boards/${boardId}/cards`)
-                    .then((res) => {
-                        for (let item of res.data) {
-                            let card = {
-                                id: item._id,
-                                title: item.title,
-                                description: item.content,
-                            };
-                            boardData.lanes.find(x => x.id === item.column).cards.push(card);
-                        }
-                        console.log(boardData);
-                        setBoardData(boardData);
-                    })
-                    .catch((err) => {
-                        console.log(err);
-                    })
-            })
-            .catch((err) => {
-                console.log(err);
-            })
-    }
+    // const loadBoardData = () => {
+    //     axios.get(`${config.api_url}/boards/${boardId}`)
+    //         .then(async (res) => {
+    //             setBoardTitle(res.data["title"]);
+    //             axios.get(`${config.api_url}/boards/${boardId}/cards`)
+    //                 .then((res) => {
+    //                     for (let item of res.data) {
+    //                         let card = {
+    //                             id: item._id,
+    //                             title: item.title,
+    //                             description: item.content,
+    //                         };
+    //                         newBoardData.lanes.find(x => x.id === item.column).cards.push(card);
+    //                     }
+    //                     console.log('newBoardData:', newBoardData);
+    //                     setBoardData(newBoardData);
+    //                 })
+    //                 .catch((err) => {
+    //                     console.log(err);
+    //                 })
+    //         })
+    //         .catch((err) => {
+    //             console.log(err);
+    //         })
+    // }
 
 
     const shouldReceiveNewData = (nextData) => {
@@ -143,6 +141,7 @@ function MyBoard(props) {
         axios.post(`${config.api_url}/cards/create`, qs.stringify(requestBody), reqConfig)
             .then((res) => {
                 console.log(res);
+                setMounted(true);
             })
             .catch((err) => {
                 console.log(err);
@@ -153,6 +152,7 @@ function MyBoard(props) {
         axios.delete(`${config.api_url}/cards/${card}/delete`)
             .then((res) => {
                 console.log(res);
+                setMounted(true);
             })
             .catch((err) => {
                 console.log(err);
@@ -184,6 +184,7 @@ function MyBoard(props) {
                 //window.location.reload(false);
                 //setBoardTitle(newBoardTitle);
                 handleCloseRenameModal();
+                setMounted(true);
             })
             .catch((err) => {
                 console.log(err);
@@ -231,6 +232,7 @@ function MyBoard(props) {
         axios.patch(`${config.api_url}/cards/${cardDetails['id']}/update`, qs.stringify(requestBody), reqConfig)
             .then((res) => {
                 //window.location.reload(false);
+                setMounted(true);
             })
             .catch((err) => {
                 console.log(err);
@@ -252,6 +254,7 @@ function MyBoard(props) {
         axios.patch(`${config.api_url}/cards/${cardId}/update`, qs.stringify(requestBody), reqConfig)
             .then((res) => {
                 //window.location.reload(false);
+                setMounted(true);
                 handleCloseEditCardModal();
             })
             .catch((err) => {
@@ -262,12 +265,6 @@ function MyBoard(props) {
     if (logined) {
         return (
             <Container fluid>
-                <div>
-                    <p>You clicked {count} times</p>
-                    <button onClick={() => setCount(count + 1)}>
-                        Click me
-      </button>
-                </div>
                 <Header />
                 <div style={{ margin: "80px" }}>
                     <div>
