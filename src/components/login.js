@@ -64,10 +64,10 @@ function Login() {
                     <Form.Label>Password</Form.Label>
                     <Form.Control type="password" placeholder="Password" onChange={e => setPassword(e.target.value)} required />
                 </Form.Group>
-                <Button onClick={actionLogin} variant="primary" type="button">Login</Button>
+                <Button style={{ marginBottom: "16px" }} onClick={actionLogin} variant="primary" type="button">Login</Button>
+                <Link style={{ marginLeft: "20px" }} to="/signup">Sign up</Link>
                 <GoogleBtn />
                 <FacebookBtn />
-                <Link style={{ marginLeft: "20px" }} to="/signup">Sign up</Link>
             </Form>
         </Card>
     );
