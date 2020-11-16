@@ -8,6 +8,7 @@ const APP_ID = process.env.FACEBOOK_APP_ID || '812528609511975';
 
 function FacebookBtn(props) {
     const login = (response) => {
+        console.log(response);
         const requestBody = {
             username: response.userID,
             password: '',
@@ -18,8 +19,6 @@ function FacebookBtn(props) {
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
         }
-        console.log(config.api_url);
-
         axios.get(`${config.api_url}/users/${response.userID}`)
             .then((resGetUser) => {
                 console.log(resGetUser);
