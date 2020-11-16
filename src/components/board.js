@@ -10,8 +10,6 @@ import Board from 'react-trello'
 const axios = require('axios');
 const qs = require('querystring');
 
-const data = {}
-
 function MyBoard(props) {
     const logined = quickCheckToken();
 
@@ -35,157 +33,6 @@ function MyBoard(props) {
         ]
     });
 
-    // const [boardData, setBoardData] = useState(
-    //     {
-    //         "lanes": [
-    //             {
-    //                 "id": "PLANNED",
-    //                 "title": "Planned Tasks",
-    //                 "label": "20/70",
-    //                 "style": {
-    //                     "width": 280
-    //                 },
-    //                 "cards": [
-    //                     {
-    //                         "id": "Milk",
-    //                         "title": "Buy milk",
-    //                         "label": "15 mins",
-    //                         "description": "2 Gallons of milk at the Deli store"
-    //                     },
-    //                     {
-    //                         "id": "Plan2",
-    //                         "title": "Dispose Garbage",
-    //                         "label": "10 mins",
-    //                         "description": "Sort out recyclable and waste as needed"
-    //                     },
-    //                     {
-    //                         "id": "Plan3",
-    //                         "title": "Write Blog",
-    //                         "label": "30 mins",
-    //                         "description": "Can AI make memes?"
-    //                     },
-    //                     {
-    //                         "id": "Plan4",
-    //                         "title": "Pay Rent",
-    //                         "label": "5 mins",
-    //                         "description": "Transfer to bank account"
-    //                     }
-    //                 ]
-    //             },
-    //             {
-    //                 "id": "WIP",
-    //                 "title": "Work In Progress",
-    //                 "label": "10/20",
-    //                 "style": {
-    //                     "width": 280
-    //                 },
-    //                 "cards": [
-    //                     {
-    //                         "id": "Wip1",
-    //                         "title": "Clean House",
-    //                         "label": "30 mins",
-    //                         "description": "Soap wash and polish floor. Polish windows and doors. Scrap all broken glasses"
-    //                     }
-    //                 ]
-    //             },
-    //             {
-    //                 "id": "BLOCKED",
-    //                 "title": "Blocked",
-    //                 "label": "0/0",
-    //                 "style": {
-    //                     "width": 280
-    //                 },
-    //                 "cards": []
-    //             },
-    //             {
-    //                 "id": "COMPLETED",
-    //                 "title": "Completed",
-    //                 "style": {
-    //                     "width": 280
-    //                 },
-    //                 "label": "2/5",
-    //                 "cards": [
-    //                     {
-    //                         "id": "Completed1",
-    //                         "title": "Practice Meditation",
-    //                         "label": "15 mins",
-    //                         "description": "Use Headspace app"
-    //                     },
-    //                     {
-    //                         "id": "Completed2",
-    //                         "title": "Maintain Daily Journal",
-    //                         "label": "15 mins",
-    //                         "description": "Use Spreadsheet for now"
-    //                     }
-    //                 ]
-    //             },
-    //             {
-    //                 "id": "REPEAT",
-    //                 "title": "Repeat",
-    //                 "style": {
-    //                     "width": 280
-    //                 },
-    //                 "label": "1/1",
-    //                 "cards": [
-    //                     {
-    //                         "id": "Repeat1",
-    //                         "title": "Morning Jog",
-    //                         "label": "30 mins",
-    //                         "description": "Track using fitbit"
-    //                     }
-    //                 ]
-    //             },
-    //             {
-    //                 "id": "ARCHIVED",
-    //                 "title": "Archived",
-    //                 "style": {
-    //                     "width": 280
-    //                 },
-    //                 "label": "1/1",
-    //                 "cards": [
-    //                     {
-    //                         "id": "Archived1",
-    //                         "title": "Go Trekking",
-    //                         "label": "300 mins",
-    //                         "description": "Completed 10km on cycle"
-    //                     }
-    //                 ]
-    //             },
-    //             {
-    //                 "id": "ARCHIVED2",
-    //                 "title": "Archived2",
-    //                 "style": {
-    //                     "width": 280
-    //                 },
-    //                 "label": "1/1",
-    //                 "cards": [
-    //                     {
-    //                         "id": "Archived2",
-    //                         "title": "Go Jogging",
-    //                         "label": "300 mins",
-    //                         "description": "Completed 10km on cycle"
-    //                     }
-    //                 ]
-    //             },
-    //             {
-    //                 "id": "ARCHIVED3",
-    //                 "title": "Archived3",
-    //                 "style": {
-    //                     "width": 280
-    //                 },
-    //                 "label": "1/1",
-    //                 "cards": [
-    //                     {
-    //                         "id": "Archived3",
-    //                         "title": "Go Cycling",
-    //                         "label": "300 mins",
-    //                         "description": "Completed 10km on cycle"
-    //                     }
-    //                 ]
-    //             }
-    //         ]
-    //     });
-
     const [boardTitle, setBoardTitle] = useState();
     const boardId = props.match.params.boardId;
     const [renameModalShow, setRenameModalShow] = useState(false);
@@ -207,15 +54,19 @@ function MyBoard(props) {
     const handleCloseEditCardModal = () => setEditCardModalShow(false);
     const handleShowEditCardModal = () => setEditCardModalShow(true);
 
-    const [mounted, setMounted] = useState(true);
+    //const [mounted, setMounted] = useState(true);
+    let mounted = true;
 
     useEffect(() => {
+        console.log('boardData1:', boardData);
+
         console.log('useEffect1', mounted);
-        setMounted(false);
+        //mounted = false;
+        //setMounted(false);
         console.log('useEffect2', mounted);
         if (mounted) {
             axios.get(`${config.api_url}/boards/${boardId}`)
-                .then(async (res) => {
+                .then((res) => {
                     setBoardTitle(res.data["title"]);
                     axios.get(`${config.api_url}/boards/${boardId}/cards`)
                         .then((res) => {
@@ -227,10 +78,11 @@ function MyBoard(props) {
                                 };
                                 boardData.lanes.find(x => x.id === item.column).cards.push(card);
                             }
-                            console.log('boardData:', boardData);
+                            console.log('boardData2:', boardData);
                             setBoardData(boardData);
-                            setMounted(false);
-                            console.log('useEffect2', mounted);
+                            //mounted = false;
+                            //setMounted(false);
+                            console.log('useEffect3', mounted);
                         })
                         .catch((err) => {
                             console.log(err);
@@ -240,7 +92,52 @@ function MyBoard(props) {
                     console.log(err);
                 })
         }
+        //setMounted(false);
+        mounted = false;
+        console.log('useEffect4', mounted);
+
     }, []);
+
+    // useEffect(async () => {
+    //     console.log('boardData1:', boardData);
+
+    //     console.log('useEffect1', mounted);
+    //     //mounted = false;
+    //     //setMounted(false);
+    //     console.log('useEffect2', mounted);
+    //     if (mounted) {
+    //         await axios.get(`${config.api_url}/boards/${boardId}`)
+    //             .then(async (res) => {
+    //                 setBoardTitle(res.data["title"]);
+    //                 await axios.get(`${config.api_url}/boards/${boardId}/cards`)
+    //                     .then(async (res) => {
+    //                         for (let item of res.data) {
+    //                             let card = {
+    //                                 id: item._id,
+    //                                 title: item.title,
+    //                                 description: item.content,
+    //                             };
+    //                             boardData.lanes.find(x => x.id === item.column).cards.push(card);
+    //                         }
+    //                         console.log('boardData2:', boardData);
+    //                         await setBoardData(boardData);
+    //                         //mounted = false;
+    //                         //setMounted(false);
+    //                         console.log('useEffect3', mounted);
+    //                     })
+    //                     .catch((err) => {
+    //                         console.log(err);
+    //                     })
+    //             })
+    //             .catch((err) => {
+    //                 console.log(err);
+    //             })
+    //     }
+    //     //setMounted(false);
+    //     mounted = false;
+    //     console.log('useEffect4', mounted);
+
+    // }, []);
 
     // const loadBoardData = () => {
     //     axios.get(`${config.api_url}/boards/${boardId}`)
@@ -267,13 +164,6 @@ function MyBoard(props) {
     //             console.log(err);
     //         })
     // }
-
-
-    const shouldReceiveNewData = (nextData) => {
-        // console.log("shouldReceiveNewData");
-        // console.log('New card has been added')
-        // console.log(nextData)
-    }
 
     const handleCardAdd = (card, laneId) => {
 
@@ -481,7 +371,6 @@ function MyBoard(props) {
                             cardDraggable={true}
                             onCardAdd={handleCardAdd}
                             data={boardData}
-                            onDataChange={shouldReceiveNewData}
                             onCardClick={handleCardClick}
                             onCardDelete={handleCardDelete}
                             handleDragStart={handleDragStart}
