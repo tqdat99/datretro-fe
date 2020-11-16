@@ -1,4 +1,4 @@
-import { getCookie, quickCheckToken, setCookie } from "../helpers";
+import { getCookie, checkToken, setCookie } from "../helpers";
 import { BrowserRouter, Redirect, Link } from 'react-router-dom';
 import { Container, Row, Col, Card, Navbar, Nav, Button, Modal, Form } from "react-bootstrap";
 import React, { useEffect, useState } from "react";
@@ -8,7 +8,7 @@ const axios = require('axios');
 const qs = require('querystring');
 
 function Home() {
-    const logined = quickCheckToken();
+    const logined = checkToken();
     const [boards, setBoards] = useState([]);
     const [show, setShow] = useState(false);
     const [newBoardTitle, setNewBoardTitle] = useState("");

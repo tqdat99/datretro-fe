@@ -1,4 +1,4 @@
-import { getCookie, quickCheckToken, setCookie } from "../helpers";
+import { getCookie, checkToken, setCookie } from "../helpers";
 import { Redirect } from 'react-router-dom';
 import { Container, Row, Button, Modal, Form, CardColumns } from "react-bootstrap";
 import React, { useEffect, useState, Component } from "react";
@@ -13,7 +13,7 @@ const qs = require('querystring');
 const data = {}
 
 function MyBoard(props) {
-    const logined = quickCheckToken();
+    const logined = checkToken();
 
     const [boardData, setBoardData] = useState({
         lanes: [

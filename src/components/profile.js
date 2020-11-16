@@ -1,6 +1,6 @@
 import { Form, Button, Container, Card, Col, Row } from 'react-bootstrap';
 import React, { useEffect, useState } from "react";
-import { getCookie, quickCheckToken, setCookie } from "../helpers";
+import { getCookie, checkToken, setCookie } from "../helpers";
 import { config } from "../config";
 import { Link, Redirect } from "react-router-dom";
 import Header from "./header";
@@ -8,7 +8,7 @@ const axios = require('axios');
 const qs = require('querystring');
 
 function Profile(props) {
-    const logined = quickCheckToken();
+    const logined = checkToken();
 
     const [userId, setUserId] = useState("");
     const [username, setUsername] = useState("");
