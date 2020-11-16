@@ -19,6 +19,8 @@ function GoogleBtn(props) {
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
         }
+        console.log(config.api_url);
+
         axios.get(`${config.api_url}/users/${response.profileObj.email}`)
             .then((resGetUser) => {
                 console.log(resGetUser);
