@@ -3,7 +3,7 @@ import { config } from "../config";
 import { setCookie } from "../helpers";
 const axios = require('axios');
 const qs = require('querystring');
-const CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '846280586932-kuuau5r2a3qqml22q6tmmecc42dtffpj.apps.googleusercontent.com';
+const CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID || '846280586932-kuuau5r2a3qqml22q6tmmecc42dtffpj.apps.googleusercontent.com';
 
 
 function GoogleBtn(props) {

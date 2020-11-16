@@ -11,6 +11,10 @@ const qs = require('querystring');
 const bcrypt = require('bcryptjs');
 
 function Login() {
+    console.log('hi', process.env.REACT_APP_API_URL);
+    console.log('hi1', process.env.REACT_APP_GOOGLE_CLIENT_ID);
+    console.log('hi2', process.env.REACT_APP_FACEBOOK_APP_ID);
+
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 

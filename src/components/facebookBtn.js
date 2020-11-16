@@ -4,7 +4,7 @@ import React from 'react';
 import FacebookLogin from 'react-facebook-login';
 const axios = require('axios');
 const qs = require('querystring');
-const APP_ID = process.env.FACEBOOK_APP_ID || '812528609511975';
+const APP_ID = process.env.REACT_APP_FACEBOOK_APP_ID || '812528609511975';
 
 function FacebookBtn(props) {
     const login = (response) => {
